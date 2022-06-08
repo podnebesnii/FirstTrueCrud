@@ -1,47 +1,43 @@
 package web.dao;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import web.model.User;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceContext;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Repository
 public class UserDaoImpl implements UserDao {
-    private static final AtomicInteger AUTO_ID = new AtomicInteger(0);
-    private static Map<Integer, User> users= new HashMap<>();
+    @PersistenceContext
+    private EntityManager entityManager;
 
-    static {
-        User user1 = new User();
-        user1.setId(AUTO_ID.getAndIncrement());
-        user1.setName("Artyom");
-        user1.setSurname("Tsepilov");
-        user1.setAge(11);
-        users.put(user1.getId(), user1);
-    }
     @Override
     public List<User> allUsers() {
-        return new ArrayList<>(users.values());
+        return entityManager.createQuery("from User").getResultList();
     }
 
     @Override
     public void add(User user) {
-        user.setId(AUTO_ID.getAndIncrement());
-        users.put(user.getId(), user);
+        entityManager.persist(user);
     }
 
     @Override
     public void delete(User user) {
-        users.remove(user.getId());
+        entityManager.remove(user);
     }
 
     @Override
     public void edit(User user) {
-        users.put(user.getId(), user);
+        entityManager.refresh(user);
     }
 
     @Override
     public User getById(int id) {
-        return users.get(id);
+        return entityManager.find(User.class, id);
     }
 }
