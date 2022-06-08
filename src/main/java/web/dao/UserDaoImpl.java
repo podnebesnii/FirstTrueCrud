@@ -1,15 +1,11 @@
 package web.dao;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
 import web.model.User;
 
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContext;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Repository
 public class UserDaoImpl implements UserDao {
@@ -18,7 +14,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public List<User> allUsers() {
-        return entityManager.createQuery("from User").getResultList();
+        return (List<User>) entityManager.createQuery("from User").getResultList();
     }
 
     @Override
@@ -28,12 +24,12 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public void delete(User user) {
-        entityManager.remove(user);
+        entityManager.remove(getById(user.getId()));
     }
 
     @Override
     public void edit(User user) {
-        entityManager.refresh(user);
+        entityManager.merge(user);
     }
 
     @Override
